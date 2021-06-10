@@ -1,18 +1,10 @@
 ---
-- name: Log into AWS ECR docker registry
-  shell: "aws ecr get-login-password | docker login --username AWS --password-stdin {{ docker_deployment_aws_ecr_repository }}"
-  when: docker_deployment_aws_ecr_repository is not none and docker_deployment_aws_ecr_repository != ''
-
 - name: Create the project folder
   file:
     dest: /var/docker/{{ docker_deployment_project_name }}
     state: directory
     mode: 0755
 
-- name: Pre release setup hook
-  include: "{{ docker_deployment_pre_release_setup_hook }}"
-  when: docker_deployment_pre_release_setup_hook is not none and docker_deployment_pre_release_setup_hook != ""
-  
 - name: Create the release folder
   file:
     dest: /var/docker/{{ docker_deployment_project_name }}/releases/{{ docker_deployment_release_name }}
@@ -44,10 +36,6 @@
     dest: /var/docker/{{ docker_deployment_project_name }}/releases/{{ docker_deployment_release_name }}/{{ item.remote }}
     state: link
   loop: '{{ docker_deployment_shared_files }}'
-
-- name: Post release setup hook
-  include: "{{ docker_deployment_post_release_setup_hook }}"
-  when: docker_deployment_post_release_setup_hook is not none and docker_deployment_post_release_setup_hook != ""
 
 - name: Check if current folder exists
   stat:
