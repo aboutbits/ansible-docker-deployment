@@ -1,55 +1,55 @@
 ---
 - name: Create the project folder
-  file:
+  ansible.builtin.file:
     dest: /var/docker/{{ docker_deployment_project_name }}
     state: directory
     mode: 0755
 
 - name: Create the release folder
-  file:
+  ansible.builtin.file:
     dest: /var/docker/{{ docker_deployment_project_name }}/releases/{{ docker_deployment_release_name }}
     state: directory
     mode: 0755
 
 - name: Copy release files
-  copy:
+  ansible.builtin.copy:
     src: '{{ item.local }}'
     dest: /var/docker/{{ docker_deployment_project_name }}/releases/{{ docker_deployment_release_name }}/{{ item.remote }}
   loop: '{{ docker_deployment_release_files }}'
 
 - name: Create the shared folder
-  file:
+  ansible.builtin.file:
     dest: /var/docker/{{ docker_deployment_project_name }}/shared
     state: directory
     mode: 0755
 
 - name: Copy shared files
-  copy:
+  ansible.builtin.copy:
     src: '{{ item.local }}'
     dest: /var/docker/{{ docker_deployment_project_name }}/shared/{{ item.remote }}
     force: no
   loop: '{{ docker_deployment_shared_files }}'
 
 - name: Link shared files into release folder
-  file:
+  ansible.builtin.file:
     src: /var/docker/{{ docker_deployment_project_name }}/shared/{{ item.remote }}
     dest: /var/docker/{{ docker_deployment_project_name }}/releases/{{ docker_deployment_release_name }}/{{ item.remote }}
     state: link
   loop: '{{ docker_deployment_shared_files }}'
 
 - name: Check if current folder exists
-  stat:
+  ansible.builtin.stat:
     path: /var/docker/{{ docker_deployment_project_name }}/current
   register: docker_deployment_current_folder_stats
 
 - name: Stop old Docker containers
-  docker_compose:
+  ansible.builtin.docker_compose:
     project_src: /var/docker/{{ docker_deployment_project_name }}/current
     state: absent
   when: docker_deployment_current_folder_stats.stat.exists
 
 - name: Updating current link
-  file:
+  ansible.builtin.file:
     src: /var/docker/{{ docker_deployment_project_name }}/releases/{{ docker_deployment_release_name }}
     dest: /var/docker/{{ docker_deployment_project_name }}/current
     state: link
@@ -57,41 +57,41 @@
 - name: Start the release
   block:
     - name: Start new Docker containers
-      docker_compose:
+      community.docker.docker_compose:
         project_src: /var/docker/{{ docker_deployment_project_name }}/current
         state: present
         pull: yes
 
     - name: Run health checks
-      shell:
+      ansible.builtin.shell:
         chdir: /var/docker/{{ docker_deployment_project_name }}/current
         cmd: python3 /var/docker/healthchecks.py
 
   rescue:
     - name: Stop new Docker containers
-      docker_compose:
+      community.docker.docker_compose:
         project_src: /var/docker/{{ docker_deployment_project_name }}/current
         state: absent
 
     - name: Delete current link if old release did not exist
-      file:
+      ansible.builtin.file:
         path: /var/docker/{{ docker_deployment_project_name }}/current
         state: absent
       when: docker_deployment_current_folder_stats.stat.exists == False 
 
     - name: Revert current link if old release existed
-      file:
+      ansible.builtin.file:
         src: '{{ docker_deployment_current_folder_stats.stat.lnk_source }}'
         dest: /var/docker/{{ docker_deployment_project_name }}/current
         state: link
       when: docker_deployment_current_folder_stats.stat.exists
 
     - name: Start old Docker containers if old release existed
-      docker_compose:
+      community.docker.docker_compose:
         project_src: /var/docker/{{ docker_deployment_project_name }}/current
         state: present
       when: docker_deployment_current_folder_stats.stat.exists
 
     - name: Fail the deployment
-      fail:
+      ansible.builtin.fail:
         msg: The deployment failed, because the 'docker-compose up' command failed or the containers did not reach a healthy state.
