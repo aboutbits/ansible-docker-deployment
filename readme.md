@@ -14,8 +14,9 @@ Deployment of a Docker project.
 
 ```yaml
 - hosts: all
-  roles:
-    - role: ansible-docker-deployment
+  tasks:
+    - ansible.builtin.include_role:
+        name: ansible-docker-deployment
       vars:
         docker_deployment_project_name: project-name
         docker_deployment_release_name: 1
