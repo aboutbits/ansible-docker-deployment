@@ -17,6 +17,12 @@
     dest: /var/docker/{{ docker_deployment_project_name }}/releases/{{ docker_deployment_release_name }}/{{ item.remote }}
   loop: '{{ docker_deployment_release_files }}'
 
+- name: Copy release templates
+  ansible.builtin.template:
+    src: '{{ item.local }}'
+    dest: /var/docker/{{ docker_deployment_project_name }}/releases/{{ docker_deployment_release_name }}/{{ item.remote }}
+  loop: '{{ docker_deployment_release_templates }}'
+
 - name: Create the shared folder
   ansible.builtin.file:
     dest: /var/docker/{{ docker_deployment_project_name }}/shared

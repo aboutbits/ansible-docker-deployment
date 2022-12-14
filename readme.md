@@ -8,6 +8,7 @@ Deployment of a Docker project.
 - `docker_deployment_project_name`: The name of the project (no whitespaces allowed)
 - `docker_deployment_release_name`: The name of the release
 - `docker_deployment_release_files`: A list of files that should be copied to the release folder (with local and remote path)
+- `docker_deployment_release_templates`: A list of template files that should be copied to the release folder (with local and remote path)
 - `docker_deployment_shared_files`: A list of files that should be copied to the shared folder if they don't already exist (with local and remote path)
 
 ## Example Playbook
@@ -23,7 +24,8 @@ Deployment of a Docker project.
         docker_deployment_release_files:
           - local: docker-compose.run.yml
             remote: docker-compose.yml
-          - local: .env
+        docker_deployment_release_templates:
+          - local: .env.j2
             remote: .env
         docker_deployment_shared_files: []
 ```

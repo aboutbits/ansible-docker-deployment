@@ -6,4 +6,5 @@ docker_deployment_release_files:
     remote: docker-compose.yml
   - local: .env
     remote: .env
+docker_deployment_release_templates: []
 docker_deployment_shared_files: []
