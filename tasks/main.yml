@@ -49,7 +49,7 @@
   register: docker_deployment_current_folder_stats
 
 - name: Stop old Docker containers
-  ansible.builtin.docker_compose:
+  ansible.builtin.docker_compose_v2:
     project_src: /var/docker/{{ docker_deployment_project_name }}/current
     state: absent
   when: docker_deployment_current_folder_stats.stat.exists
@@ -63,7 +63,7 @@
 - name: Start the release
   block:
     - name: Start new Docker containers
-      community.docker.docker_compose:
+      community.docker.docker_compose_v2:
         project_src: /var/docker/{{ docker_deployment_project_name }}/current
         state: present
         pull: yes
@@ -75,7 +75,7 @@
 
   rescue:
     - name: Stop new Docker containers
-      community.docker.docker_compose:
+      community.docker.docker_compose_v2:
         project_src: /var/docker/{{ docker_deployment_project_name }}/current
         state: absent
 
@@ -93,7 +93,7 @@
       when: docker_deployment_current_folder_stats.stat.exists
 
     - name: Start old Docker containers if old release existed
-      community.docker.docker_compose:
+      community.docker.docker_compose_v2:
         project_src: /var/docker/{{ docker_deployment_project_name }}/current
         state: present
       when: docker_deployment_current_folder_stats.stat.exists

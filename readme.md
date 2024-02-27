@@ -37,15 +37,15 @@ In order to have a verioning in place and working, create leightweight tags that
 Creating a new minor release:
 
 ```bash
-git tag v2
+git tag v3
 git push --tags
 ```
 
 Replacing an already existing minor release:
 
 ```bash
-git tag -d v2
-git push origin :refs/tags/v2
-git tag v2
+git tag -d v3
+git push origin :refs/tags/v3
+git tag v3
 git push --tags
 ```
