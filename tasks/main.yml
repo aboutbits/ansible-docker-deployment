@@ -49,7 +49,7 @@
   register: docker_deployment_current_folder_stats
 
 - name: Stop old Docker containers
-  ansible.builtin.docker_compose_v2:
+  community.docker.docker_compose_v2:
     project_src: /var/docker/{{ docker_deployment_project_name }}/current
     state: absent
   when: docker_deployment_current_folder_stats.stat.exists
