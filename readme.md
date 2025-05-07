@@ -32,7 +32,7 @@ Deployment of a Docker project.
 
 ## Versioning
 
-In order to have a verioning in place and working, create leightweight tags that point to the appropriate minor release versions.
+In order to have a versioning in place and working, create leightweight tags that point to the appropriate minor release versions.
 
 Creating a new minor release:
 
